@@ -3,206 +3,196 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#101827">
-  <title>وەرگێڕی ژیر | Smart Translator</title>
+  <meta name="theme-color" content="#f0f9ff">
+  <title>وەرگێڕی ژیر</title>
   <style>
-    * {
-      box-sizing: border-box;
+    :root {
+      --bg-color: #f0f9ff;
+      --text-color: #0f2b46;
+      --card-bg: #ffffff;
+      --border-color: #b8d2e3;
+      --primary: #1874a5;
+      --primary-hover: #125a82;
+      --tab-bg: #e0f2fe;
     }
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #0b1120;
-      color: #f8fafc;
-      min-height: 100vh;
+    [data-theme="dark"] {
+      --bg-color: #0f172a;
+      --text-color: #f8fafc;
+      --card-bg: #1e293b;
+      --border-color: #334155;
+      --primary: #38bdf8;
+      --primary-hover: #0284c7;
+      --tab-bg: #334155;
     }
-    header {
-      padding: 24px 16px;
-      text-align: center;
-      background: #111c30;
-      border-bottom: 1px solid #26354d;
-    }
-    header h1 {
-      margin: 0;
-      color: #38d9c0;
-      font-size: 27px;
-    }
-    header p {
-      color: #a8b7cb;
-      font-size: 14px;
-    }
-    main {
-      max-width: 700px;
-      margin: 28px auto;
-      padding: 0 16px;
-    }
-    .card {
-      background: #131e32;
-      border: 1px solid #293952;
-      border-radius: 18px;
-      padding: 20px;
-      margin-bottom: 18px;
-    }
-    h2 {
-      font-size: 19px;
-      margin-top: 0;
-    }
-    textarea {
+    * { box-sizing: border-box; font-family: Arial, sans-serif; transition: background-color 0.3s, color 0.3s; }
+    body { margin: 0; background: var(--bg-color); color: var(--text-color); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; }
+    
+    .app-container {
+      background: var(--bg-color);
       width: 100%;
-      min-height: 160px;
-      padding: 14px;
-      border-radius: 12px;
-      border: 1px solid #354660;
-      background: #0b1425;
-      color: white;
-      font-size: 16px;
-      resize: vertical;
-      direction: auto;
+      max-width: 450px;
+      min-height: 850px;
+      border-radius: 40px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      position: relative;
+      overflow: hidden;
+      border: 6px solid #e2e8f0;
+      display: flex;
+      flex-direction: column;
+      padding: 30px 20px;
     }
-    button, .upload-label {
-      display: inline-block;
-      width: 100%;
-      padding: 14px;
-      margin-top: 12px;
-      border: none;
-      border-radius: 12px;
-      background: #38d9c0;
-      color: #071521;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-      text-align: center;
-    }
-    button:disabled {
-      opacity: 0.6;
-      cursor: wait;
-    }
-    .secondary {
-      background: #24344d;
-      color: white;
-    }
-    input[type="file"] {
-      display: none;
-    }
-    #status, #imageStatus, #fileStatus {
-      color: #a8b7cb;
-      font-size: 14px;
-      line-height: 1.8;
-      overflow-wrap: anywhere;
-      margin-top: 10px;
-    }
-    #result {
-      white-space: pre-wrap;
-      overflow-wrap: anywhere;
-      line-height: 1.9;
-      direction: auto;
-    }
-    footer {
-      text-align: center;
-      padding: 25px;
-      color: #8393aa;
-      font-size: 13px;
-    }
-    /* زیادکراوەکان بۆ وێنە */
-    .canvas-container {
-      width: 100%;
-      overflow-x: auto;
-      margin-top: 15px;
-      display: none;
-      border: 1px solid #354660;
-      border-radius: 12px;
-      background: #0b1425;
-    }
-    canvas {
-      max-width: 100%;
-      height: auto;
-      display: block;
-    }
-    #downloadImageBtn {
-      display: none;
-    }
+    [data-theme="dark"] .app-container { border-color: #1e293b; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+
+    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+    header h1 { margin: 0; font-size: 22px; display: flex; align-items: center; gap: 8px; color: var(--text-color); }
+    .theme-toggle { background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text-color); }
+
+    .tabs { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 30px; }
+    .tab-btn { flex: 1; padding: 12px 5px; border-radius: 20px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-color); font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 14px; }
+    .tab-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+    .tab-content { display: none; flex-direction: column; flex: 1; }
+    .tab-content.active { display: flex; }
+
+    .box { background: var(--card-bg); border: 2px solid var(--border-color); border-radius: 15px; padding: 15px; text-align: center; position: relative; margin-bottom: 15px; }
+    .box textarea { width: 100%; min-height: 120px; border: none; background: transparent; color: var(--text-color); font-size: 18px; text-align: center; resize: none; outline: none; }
+    .box-label { font-size: 14px; font-weight: bold; color: var(--text-color); margin-top: 10px; }
+    
+    .arrow-down { text-align: center; font-size: 24px; color: var(--primary); margin: -5px 0 10px 0; }
+
+    .box.dark-box { background: var(--primary); border-color: var(--primary); color: white; }
+    .box.dark-box textarea { color: white; }
+    .box.dark-box .box-label { color: white; }
+
+    .action-btn { background: var(--primary); color: white; border: none; border-radius: 20px; padding: 18px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: auto; display: flex; justify-content: center; align-items: center; gap: 10px; width: 100%; box-shadow: 0 4px 15px rgba(24, 116, 165, 0.3); }
+    .action-btn:disabled { opacity: 0.6; cursor: wait; }
+
+    /* بەشی وێنە */
+    .upload-area { border: 2px dashed var(--primary); border-radius: 20px; padding: 40px 20px; text-align: center; cursor: pointer; background: var(--card-bg); margin-bottom: 20px; }
+    .upload-icon { font-size: 40px; color: var(--primary); margin-bottom: 10px; }
+    .upload-text { color: var(--text-color); font-weight: bold; font-size: 16px; }
+    #imageFile { display: none; }
+    .canvas-container { width: 100%; overflow-x: auto; margin-bottom: 15px; display: none; border: 2px solid var(--border-color); border-radius: 12px; }
+    canvas { max-width: 100%; height: auto; display: block; }
+    
+    /* نەخشی باکگراوند */
+    .waves { position: absolute; bottom: 100px; left: 10px; opacity: 0.3; }
+    .waves2 { position: absolute; top: 300px; right: 10px; opacity: 0.3; }
+    
+    #statusMsg { text-align: center; font-size: 13px; margin-top: 10px; color: var(--text-color); }
   </style>
 </head>
 <body>
-  <header>
-    <h1>وەرگێڕی ژیر 🌐</h1>
-    <p>Smart Kurdish Translator</p>
-    <p>وەرگێڕانی ژیرانە بۆ زمانی کوردی</p>
-  </header>
-  <main>
-    <section class="card">
-      <h2>📝 وەرگێڕانی دەق</h2>
-      <textarea id="sourceText" placeholder="دەقەکەت لێرە دابنێ..."></textarea>
-      <button id="translateButton" onclick="translateText()">وەرگێڕان بۆ کوردی</button>
-      <p id="status" role="status">ئامادەیە بۆ وەرگێڕان.</p>
-    </section>
 
-    <section class="card">
-      <h2>✨ ئەنجامی وەرگێڕان</h2>
-      <div id="result">ئەنجامی وەرگێڕان لێرە پیشان دەدرێت.</div>
-      <button class="secondary" onclick="copyResult()">کۆپیکردنی وەرگێڕان</button>
-    </section>
+  <div class="app-container">
+    <header>
+      <button class="theme-toggle" id="themeBtn" onclick="toggleTheme()">🌓</button>
+      <h1>وەرگێڕی ژیر <span>🌀</span></h1>
+    </header>
 
-    <section class="card">
-      <h2>🖼️ وەرگێڕانی وێنە</h2>
-      <label class="upload-label" for="imageFile">هەڵبژاردنی وێنە</label>
+    <nav class="tabs">
+      <button class="tab-btn active" onclick="switchTab('text')">نووسین ✏️</button>
+      <button class="tab-btn" onclick="switchTab('file')">فایل 📄</button>
+      <button class="tab-btn" onclick="switchTab('image')">وێنە 📷</button>
+    </nav>
+
+    <!-- بەشی نووسین -->
+    <main id="tab-text" class="tab-content active">
+      <div class="box">
+        <textarea id="sourceText" placeholder="Write english text here"></textarea>
+      </div>
+      <div class="box-label" style="text-align: center; margin-top:-5px; margin-bottom:5px;">دەقی ئینگلیزی</div>
+      
+      <div class="arrow-down">↓</div>
+
+      <div class="box dark-box">
+        <textarea id="resultText" placeholder="دەقی کوردی لێرە دەردەکەوێت" readonly></textarea>
+      </div>
+      <div class="box-label" style="text-align: center; margin-top:-5px;">دەقی کوردی</div>
+
+      <div style="flex-grow: 1;"></div>
+      <button class="action-btn" onclick="translateText()">وەرگێڕان بۆ کوردی 🔄</button>
+    </main>
+
+    <!-- بەشی فایل -->
+    <main id="tab-file" class="tab-content">
+      <div class="box" style="padding: 25px 15px;">
+        <span style="font-size:18px; font-weight:bold;">📄 Englishbook.pdf</span>
+      </div>
+      <div class="box-label" style="text-align: center; margin-top:-5px; margin-bottom:5px;">ئەو فایلەی دیاری کراوە</div>
+      
+      <div class="arrow-down">↓</div>
+
+      <div class="box" style="background: #d1fae5; border-color: #34d399; padding: 25px 15px;">
+        <span style="font-size:18px; font-weight:bold; color: #065f46;">📄 Englishbook_Kurdish.pdf</span>
+      </div>
+      <div class="box-label" style="text-align: center; margin-top:-5px;">ئەو فایلەی وەرگێڕدراو بۆ زمانی کوردی</div>
+
+      <div style="flex-grow: 1;"></div>
+      <button class="action-btn" onclick="alert('بەشی فایل لە داهاتوودا بەردەست دەبێت')">داگرتنی فایلی وەرگێڕدراو 📥</button>
+    </main>
+
+    <!-- بەشی وێنە -->
+    <main id="tab-image" class="tab-content">
+      <label for="imageFile">
+        <div class="upload-area">
+          <div class="upload-icon">↑</div>
+          <div class="upload-text">وێنەکە لێرە دابنێ یان کامێرا بکەرەوە</div>
+        </div>
+      </label>
       <input id="imageFile" type="file" accept="image/jpeg, image/png, image/webp">
-      <button id="translateImageBtn" style="display:none;" onclick="processImage()">وەرگێڕانی وێنەکە</button>
-      <p id="imageStatus">وێنەیەک هەڵبژێرە بۆ دەستپێکردن.</p>
       
       <div class="canvas-container" id="canvasContainer">
         <canvas id="imageCanvas"></canvas>
       </div>
-      <button id="downloadImageBtn" class="secondary" onclick="downloadTranslatedImage()">داگرتنی وێنەکە</button>
-    </section>
+      
+      <p id="statusMsg"></p>
 
-    <section class="card">
-      <h2>📄 وەرگێڕانی فایل</h2>
-      <label class="upload-label" for="documentFile">هەڵبژاردنی فایل</label>
-      <input id="documentFile" type="file" accept=".pdf,.docx,.pptx,.xlsx,.txt,.jpg,.jpeg,.png">
-      <p id="fileStatus">بەشی فایل لە هەنگاوەکانی داهاتوودا چالاک دەکرێت.</p>
-    </section>
-  </main>
-  <footer>
-    Smart Kurdish Translator · Powered by Gemini
-  </footer>
+      <div style="flex-grow: 1;"></div>
+      <button class="action-btn" id="translateImageBtn" onclick="processImage()">وێنەی وەرگێڕدراو بۆ کوردی 🖼️</button>
+      <button class="action-btn" id="downloadImageBtn" style="display:none; background:#10b981; margin-top:10px;" onclick="downloadTranslatedImage()">داگرتنی وێنەکە 📥</button>
+    </main>
+
+  </div>
 
   <script>
-    // URL ـی Cloudflare Worker ـەکەت لێرە دابنێ لە هەنگاوی داهاتوودا
-    const WORKER_URL = "https://wild-hat-0191.themost2727.workers.dev";
+    // تکایە لێرەدا لینکە ڕاستەقینەکەی Worker ـەکەت دابنێ
+    const WORKER_URL = "YOUR_WORKER_URL_HERE"; // بیخە شوێنی ئەمە
     
-    let originalImageObj = null;
-
-    async function translateText() {
-      // هەمان کۆدی پێشووت
-      const input = document.getElementById("sourceText").value.trim();
-      const result = document.getElementById("result");
-      const status = document.getElementById("status");
-      if (!input) { status.textContent = "تکایە سەرەتا دەقەکەت بنووسە."; return; }
-      status.textContent = "ئەم بەشە هێشتا بە Gemini API نەبەستراوەتەوە.";
-    }
-
-    async function copyResult() {
-      // هەمان کۆدی پێشووت
-      const text = document.getElementById("result").innerText;
-      try {
-        await navigator.clipboard.writeText(text);
-        document.getElementById("status").textContent = "دەقەکە کۆپی کرا.";
-      } catch {
-        document.getElementById("status").textContent = "تکایە دەقەکە بە دەست هەڵبژێرە و کۆپی بکە.";
+    // دۆخی تاریک و ڕوون
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-theme');
+      if(current === 'dark') {
+        document.documentElement.removeAttribute('data-theme');
+      } else {
+        document.documentElement.setAttribute('data-theme', 'dark');
       }
     }
 
-    // هەڵبژاردنی وێنە و نیشاندانی
+    // گۆڕینی تابلۆکان (Tabs)
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+      
+      event.currentTarget.classList.add('active');
+      document.getElementById('tab-' + tabId).classList.add('active');
+    }
+
+    // لۆجیکی پێشووی وێنەکە
+    let originalImageObj = null;
+
+    function translateText() {
+      document.getElementById("resultText").value = "ئەم بەشە هێشتا بە Gemini نەبەستراوەتەوە.";
+    }
+
     document.getElementById("imageFile").addEventListener("change", event => {
       const file = event.target.files[0];
       if (file) {
-        document.getElementById("imageStatus").textContent = "وێنە هەڵبژێردرا: " + file.name;
-        document.getElementById("translateImageBtn").style.display = "block";
+        document.getElementById("statusMsg").textContent = "وێنە هەڵبژێردرا: " + file.name;
         document.getElementById("canvasContainer").style.display = "none";
         document.getElementById("downloadImageBtn").style.display = "none";
+        document.getElementById("translateImageBtn").style.display = "flex";
         
-        // وێنەکە بخوێنەرەوە بۆ ناو Canvas
         const reader = new FileReader();
         reader.onload = function(e) {
           originalImageObj = new Image();
@@ -220,20 +210,18 @@
       }
     });
 
-    // ناردنی وێنە بۆ Worker و وەرگرتنی ئەنجام
     async function processImage() {
-      if (!originalImageObj || WORKER_URL === "YOUR_WORKER_URL_HERE") {
-        document.getElementById("imageStatus").textContent = "تکایە سەرەتا لینکی Worker ـەکە لە کۆدەکەدا دابنێ.";
+      if (!originalImageObj) {
+        document.getElementById("statusMsg").textContent = "تکایە سەرەتا وێنەیەک هەڵبژێرە";
         return;
       }
 
       const btn = document.getElementById("translateImageBtn");
-      const status = document.getElementById("imageStatus");
+      const status = document.getElementById("statusMsg");
       btn.disabled = true;
-      status.textContent = "خەریکی وەرگێڕان... تکایە چاوەڕێ بە (لەوانەیە چەند چرکەیەک بخایەنێت).";
+      status.innerHTML = "خەریکی وەرگێڕان... تکایە چاوەڕێ بە.";
 
       try {
-        // وەرگرتنی base64 ـی وێنەکە
         const canvas = document.getElementById('imageCanvas');
         const base64Image = canvas.toDataURL("image/jpeg").split(',')[1];
 
@@ -243,70 +231,62 @@
           body: JSON.stringify({ image: base64Image, mimeType: 'image/jpeg' })
         });
 
-        if (!response.ok) throw new Error("کێشەیەک لە سێرڤەر ڕوویدا");
-        
+        if (!response.ok) throw new Error("کێشەیەک لە پەیوەندی سێرڤەر ڕوویدا");
         const data = await response.json();
-        
         if (data.error) throw new Error(data.error);
 
-        drawTranslationsOnCanvas(data.translations);
-        status.textContent = "وەرگێڕان بە سەرکەوتوویی تەواو بوو!";
-        document.getElementById("downloadImageBtn").style.display = "block";
+        let transArray = data.translations;
+        if (!Array.isArray(transArray)) {
+           if (transArray && transArray.translations) transArray = transArray.translations;
+           else throw new Error("فۆرماتی داتا هەڵەیە");
+        }
+
+        status.innerHTML = "وەرگێڕان بە سەرکەوتوویی تەواو بوو!";
+        drawTranslationsOnCanvas(transArray);
+        
+        btn.style.display = "none";
+        document.getElementById("downloadImageBtn").style.display = "flex";
 
       } catch (error) {
         status.textContent = "کێشەیەک ڕوویدا: " + error.message;
-      } finally {
         btn.disabled = false;
       }
     }
 
-    // کێشانی سێبەر و نووسین لەسەر وێنەکە
     function drawTranslationsOnCanvas(translations) {
       const canvas = document.getElementById('imageCanvas');
       const ctx = canvas.getContext('2d');
       const width = canvas.width;
       const height = canvas.height;
 
-      // دووبارە کێشانەوەی وێنە ئەسڵییەکە بۆ پاککردنەوەی هەر گۆڕانکارییەکی پێشوو
       ctx.drawImage(originalImageObj, 0, 0);
 
       translations.forEach(item => {
-        // بۆکسەکان لە 0-1000 پێوانە کراون، دەیگۆڕین بۆ پێوانەی پیکسڵی وێنەکە
+        if(!item.box_2d || item.box_2d.length !== 4) return;
         const [ymin, xmin, ymax, xmax] = item.box_2d;
         const x = (xmin / 1000) * width;
         const y = (ymin / 1000) * height;
         const boxWidth = ((xmax - xmin) / 1000) * width;
         const boxHeight = ((ymax - ymin) / 1000) * height;
 
-        // کێشانی بۆکسێکی خۆڵەمێشی ڕوون
-        ctx.fillStyle = 'rgba(70, 75, 80, 0.85)';
+        ctx.fillStyle = 'rgba(24, 116, 165, 0.85)'; // شینی دیزاینەکە
         ctx.fillRect(x, y, boxWidth, boxHeight);
 
-        // ڕێکخستنی دەقی کوردی (ڕاست بۆ چەپ)
         ctx.fillStyle = '#ffffff';
-        ctx.textAlign = 'right';
+        ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.direction = 'rtl';
         
-        // دۆزینەوەی باشترین قەبارەی فۆنت بۆ ئەوەی جێگەی ببێتەوە
-        let fontSize = Math.min(boxHeight * 0.8, boxWidth * 0.2); 
+        let fontSize = Math.min(boxHeight * 0.7, boxWidth * 0.15); 
         ctx.font = `bold ${fontSize}px Arial, sans-serif`;
         
-        // گەر نووسینەکە درێژتر بوو لە بۆکسەکە، قەبارەی فۆنتەکە بچووک دەکەینەوە
-        while (ctx.measureText(item.kurdish_translation).width > (boxWidth * 0.9) && fontSize > 8) {
-          fontSize -= 1;
-          ctx.font = `bold ${fontSize}px Arial, sans-serif`;
-        }
-
-        // نووسینی دەقەکە لە ناوەڕاستی بۆکسەکەدا
-        const textX = x + boxWidth - (boxWidth * 0.05); // کەمێک لێوار دەهێڵینەوە
+        const textX = x + (boxWidth / 2); 
         const textY = y + (boxHeight / 2);
         
-        ctx.fillText(item.kurdish_translation, textX, textY);
+        ctx.fillText(item.kurdish_translation || "", textX, textY);
       });
     }
 
-    // داگرتنی وێنە وەرگێڕدراوەکە
     function downloadTranslatedImage() {
       const canvas = document.getElementById('imageCanvas');
       const link = document.createElement('a');
