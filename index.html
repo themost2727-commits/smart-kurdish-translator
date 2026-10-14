@@ -84,11 +84,12 @@
     input[type="file"] {
       display: none;
     }
-    #status {
+    #status, #imageStatus, #fileStatus {
       color: #a8b7cb;
       font-size: 14px;
       line-height: 1.8;
       overflow-wrap: anywhere;
+      margin-top: 10px;
     }
     #result {
       white-space: pre-wrap;
@@ -102,6 +103,24 @@
       color: #8393aa;
       font-size: 13px;
     }
+    /* زیادکراوەکان بۆ وێنە */
+    .canvas-container {
+      width: 100%;
+      overflow-x: auto;
+      margin-top: 15px;
+      display: none;
+      border: 1px solid #354660;
+      border-radius: 12px;
+      background: #0b1425;
+    }
+    canvas {
+      max-width: 100%;
+      height: auto;
+      display: block;
+    }
+    #downloadImageBtn {
+      display: none;
+    }
   </style>
 </head>
 <body>
@@ -113,83 +132,188 @@
   <main>
     <section class="card">
       <h2>📝 وەرگێڕانی دەق</h2>
-      <textarea
-        id="sourceText"
-        placeholder="دەقەکەت لێرە دابنێ..."
-      ></textarea>
-      <button id="translateButton" onclick="translateText()">
-        وەرگێڕان بۆ کوردی
-      </button>
+      <textarea id="sourceText" placeholder="دەقەکەت لێرە دابنێ..."></textarea>
+      <button id="translateButton" onclick="translateText()">وەرگێڕان بۆ کوردی</button>
       <p id="status" role="status">ئامادەیە بۆ وەرگێڕان.</p>
     </section>
+
     <section class="card">
       <h2>✨ ئەنجامی وەرگێڕان</h2>
       <div id="result">ئەنجامی وەرگێڕان لێرە پیشان دەدرێت.</div>
-      <button class="secondary" onclick="copyResult()">
-        کۆپیکردنی وەرگێڕان
-      </button>
+      <button class="secondary" onclick="copyResult()">کۆپیکردنی وەرگێڕان</button>
     </section>
+
     <section class="card">
       <h2>🖼️ وەرگێڕانی وێنە</h2>
-      <label class="upload-label" for="imageFile">
-        هەڵبژاردنی وێنە
-      </label>
-      <input id="imageFile" type="file" accept="image/*">
-      <p id="imageStatus">بەشی وەرگێڕانی وێنە لە هەنگاوەکانی داهاتوودا چالاک دەکرێت.</p>
+      <label class="upload-label" for="imageFile">هەڵبژاردنی وێنە</label>
+      <input id="imageFile" type="file" accept="image/jpeg, image/png, image/webp">
+      <button id="translateImageBtn" style="display:none;" onclick="processImage()">وەرگێڕانی وێنەکە</button>
+      <p id="imageStatus">وێنەیەک هەڵبژێرە بۆ دەستپێکردن.</p>
+      
+      <div class="canvas-container" id="canvasContainer">
+        <canvas id="imageCanvas"></canvas>
+      </div>
+      <button id="downloadImageBtn" class="secondary" onclick="downloadTranslatedImage()">داگرتنی وێنەکە</button>
     </section>
+
     <section class="card">
       <h2>📄 وەرگێڕانی فایل</h2>
-      <label class="upload-label" for="documentFile">
-        هەڵبژاردنی فایل
-      </label>
-      <input id="documentFile" type="file"
-        accept=".pdf,.docx,.pptx,.xlsx,.txt,.jpg,.jpeg,.png">
+      <label class="upload-label" for="documentFile">هەڵبژاردنی فایل</label>
+      <input id="documentFile" type="file" accept=".pdf,.docx,.pptx,.xlsx,.txt,.jpg,.jpeg,.png">
       <p id="fileStatus">بەشی فایل لە هەنگاوەکانی داهاتوودا چالاک دەکرێت.</p>
     </section>
   </main>
   <footer>
     Smart Kurdish Translator · Powered by Gemini
   </footer>
+
   <script>
+    // URL ـی Cloudflare Worker ـەکەت لێرە دابنێ لە هەنگاوی داهاتوودا
+    const WORKER_URL = "YOUR_WORKER_URL_HERE";
+    
+    let originalImageObj = null;
+
     async function translateText() {
+      // هەمان کۆدی پێشووت
       const input = document.getElementById("sourceText").value.trim();
       const result = document.getElementById("result");
       const status = document.getElementById("status");
-      const button = document.getElementById("translateButton");
-      if (!input) {
-        status.textContent = "تکایە سەرەتا دەقەکەت بنووسە.";
-        return;
-      }
+      if (!input) { status.textContent = "تکایە سەرەتا دەقەکەت بنووسە."; return; }
       status.textContent = "ئەم بەشە هێشتا بە Gemini API نەبەستراوەتەوە.";
-      result.textContent =
-        "بۆ چالاککردنی وەرگێڕان، لە هەنگاوی داهاتوودا Cloudflare Worker بە Gemini دەبەستینەوە.";
     }
+
     async function copyResult() {
+      // هەمان کۆدی پێشووت
       const text = document.getElementById("result").innerText;
       try {
         await navigator.clipboard.writeText(text);
         document.getElementById("status").textContent = "دەقەکە کۆپی کرا.";
       } catch {
-        document.getElementById("status").textContent =
-          "تکایە دەقەکە بە دەست هەڵبژێرە و کۆپی بکە.";
+        document.getElementById("status").textContent = "تکایە دەقەکە بە دەست هەڵبژێرە و کۆپی بکە.";
       }
     }
+
+    // هەڵبژاردنی وێنە و نیشاندانی
     document.getElementById("imageFile").addEventListener("change", event => {
       const file = event.target.files[0];
       if (file) {
-        document.getElementById("imageStatus").textContent =
-          "وێنە هەڵبژێردرا: " + file.name +
-          " — بەشی وەرگێڕان لە هەنگاوی داهاتوودا چالاک دەکرێت.";
+        document.getElementById("imageStatus").textContent = "وێنە هەڵبژێردرا: " + file.name;
+        document.getElementById("translateImageBtn").style.display = "block";
+        document.getElementById("canvasContainer").style.display = "none";
+        document.getElementById("downloadImageBtn").style.display = "none";
+        
+        // وێنەکە بخوێنەرەوە بۆ ناو Canvas
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          originalImageObj = new Image();
+          originalImageObj.onload = function() {
+            const canvas = document.getElementById('imageCanvas');
+            canvas.width = originalImageObj.width;
+            canvas.height = originalImageObj.height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(originalImageObj, 0, 0);
+            document.getElementById("canvasContainer").style.display = "block";
+          }
+          originalImageObj.src = e.target.result;
+        }
+        reader.readAsDataURL(file);
       }
     });
-    document.getElementById("documentFile").addEventListener("change", event => {
-      const file = event.target.files[0];
-      if (file) {
-        document.getElementById("fileStatus").textContent =
-          "فایل هەڵبژێردرا: " + file.name +
-          " — بەشی وەرگێڕان و داگرتن لە هەنگاوی داهاتوودا چالاک دەکرێت.";
+
+    // ناردنی وێنە بۆ Worker و وەرگرتنی ئەنجام
+    async function processImage() {
+      if (!originalImageObj || WORKER_URL === "YOUR_WORKER_URL_HERE") {
+        document.getElementById("imageStatus").textContent = "تکایە سەرەتا لینکی Worker ـەکە لە کۆدەکەدا دابنێ.";
+        return;
       }
-    });
+
+      const btn = document.getElementById("translateImageBtn");
+      const status = document.getElementById("imageStatus");
+      btn.disabled = true;
+      status.textContent = "خەریکی وەرگێڕان... تکایە چاوەڕێ بە (لەوانەیە چەند چرکەیەک بخایەنێت).";
+
+      try {
+        // وەرگرتنی base64 ـی وێنەکە
+        const canvas = document.getElementById('imageCanvas');
+        const base64Image = canvas.toDataURL("image/jpeg").split(',')[1];
+
+        const response = await fetch(WORKER_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ image: base64Image, mimeType: 'image/jpeg' })
+        });
+
+        if (!response.ok) throw new Error("کێشەیەک لە سێرڤەر ڕوویدا");
+        
+        const data = await response.json();
+        
+        if (data.error) throw new Error(data.error);
+
+        drawTranslationsOnCanvas(data.translations);
+        status.textContent = "وەرگێڕان بە سەرکەوتوویی تەواو بوو!";
+        document.getElementById("downloadImageBtn").style.display = "block";
+
+      } catch (error) {
+        status.textContent = "کێشەیەک ڕوویدا: " + error.message;
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    // کێشانی سێبەر و نووسین لەسەر وێنەکە
+    function drawTranslationsOnCanvas(translations) {
+      const canvas = document.getElementById('imageCanvas');
+      const ctx = canvas.getContext('2d');
+      const width = canvas.width;
+      const height = canvas.height;
+
+      // دووبارە کێشانەوەی وێنە ئەسڵییەکە بۆ پاککردنەوەی هەر گۆڕانکارییەکی پێشوو
+      ctx.drawImage(originalImageObj, 0, 0);
+
+      translations.forEach(item => {
+        // بۆکسەکان لە 0-1000 پێوانە کراون، دەیگۆڕین بۆ پێوانەی پیکسڵی وێنەکە
+        const [ymin, xmin, ymax, xmax] = item.box_2d;
+        const x = (xmin / 1000) * width;
+        const y = (ymin / 1000) * height;
+        const boxWidth = ((xmax - xmin) / 1000) * width;
+        const boxHeight = ((ymax - ymin) / 1000) * height;
+
+        // کێشانی بۆکسێکی خۆڵەمێشی ڕوون
+        ctx.fillStyle = 'rgba(70, 75, 80, 0.85)';
+        ctx.fillRect(x, y, boxWidth, boxHeight);
+
+        // ڕێکخستنی دەقی کوردی (ڕاست بۆ چەپ)
+        ctx.fillStyle = '#ffffff';
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'middle';
+        ctx.direction = 'rtl';
+        
+        // دۆزینەوەی باشترین قەبارەی فۆنت بۆ ئەوەی جێگەی ببێتەوە
+        let fontSize = Math.min(boxHeight * 0.8, boxWidth * 0.2); 
+        ctx.font = `bold ${fontSize}px Arial, sans-serif`;
+        
+        // گەر نووسینەکە درێژتر بوو لە بۆکسەکە، قەبارەی فۆنتەکە بچووک دەکەینەوە
+        while (ctx.measureText(item.kurdish_translation).width > (boxWidth * 0.9) && fontSize > 8) {
+          fontSize -= 1;
+          ctx.font = `bold ${fontSize}px Arial, sans-serif`;
+        }
+
+        // نووسینی دەقەکە لە ناوەڕاستی بۆکسەکەدا
+        const textX = x + boxWidth - (boxWidth * 0.05); // کەمێک لێوار دەهێڵینەوە
+        const textY = y + (boxHeight / 2);
+        
+        ctx.fillText(item.kurdish_translation, textX, textY);
+      });
+    }
+
+    // داگرتنی وێنە وەرگێڕدراوەکە
+    function downloadTranslatedImage() {
+      const canvas = document.getElementById('imageCanvas');
+      const link = document.createElement('a');
+      link.download = 'translated-image.png';
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+    }
   </script>
 </body>
 </html>
