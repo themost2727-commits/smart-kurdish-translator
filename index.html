@@ -11,8 +11,9 @@
       --text-color: #0f2b46;
       --card-bg: #ffffff;
       --border-color: #b8d2e3;
-      --primary: #1874a5;
-      --primary-hover: #125a82;
+      --primary: #4ab3ed; /* ڕەنگی شینی کاڵتر */
+      --primary-hover: #3299d4;
+      --glow-color: rgba(74, 179, 237, 0.4); /* ڕەنگی درەوشانەوە */
       --tab-bg: #e0f2fe;
     }
     [data-theme="dark"] {
@@ -22,68 +23,51 @@
       --border-color: #334155;
       --primary: #38bdf8;
       --primary-hover: #0284c7;
+      --glow-color: rgba(56, 189, 248, 0.4);
       --tab-bg: #334155;
     }
-    * { box-sizing: border-box; font-family: Arial, sans-serif; transition: background-color 0.3s, color 0.3s; }
+    * { box-sizing: border-box; font-family: Arial, sans-serif; transition: background-color 0.3s, color 0.3s, box-shadow 0.3s; }
     body { margin: 0; background: var(--bg-color); color: var(--text-color); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; }
     
-    .app-container {
-      background: var(--bg-color);
-      width: 100%;
-      max-width: 450px;
-      min-height: 850px;
-      border-radius: 40px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-      position: relative;
-      overflow: hidden;
-      border: 6px solid #e2e8f0;
-      display: flex;
-      flex-direction: column;
-      padding: 30px 20px;
-    }
+    .app-container { background: var(--bg-color); width: 100%; max-width: 450px; min-height: 850px; border-radius: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); position: relative; overflow: hidden; border: 6px solid #e2e8f0; display: flex; flex-direction: column; padding: 30px 20px; }
     [data-theme="dark"] .app-container { border-color: #1e293b; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-
     header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
     header h1 { margin: 0; font-size: 22px; display: flex; align-items: center; gap: 8px; color: var(--text-color); }
     .theme-toggle { background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text-color); }
-
     .tabs { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 30px; }
+    
     .tab-btn { flex: 1; padding: 12px 5px; border-radius: 20px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-color); font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 14px; }
-    .tab-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
-
+    .tab-btn.active { background: var(--primary); color: white; border-color: var(--primary); box-shadow: 0 0 15px var(--glow-color); /* درەوشانەوەی تابلۆ */ }
+    
     .tab-content { display: none; flex-direction: column; flex: 1; }
     .tab-content.active { display: flex; }
-
-    .box { background: var(--card-bg); border: 2px solid var(--border-color); border-radius: 15px; padding: 15px; text-align: center; position: relative; margin-bottom: 15px; }
+    
+    .box { background: var(--card-bg); border: 2px solid var(--border-color); border-radius: 15px; padding: 15px; text-align: center; position: relative; margin-bottom: 15px; box-shadow: 0 0 15px var(--glow-color); /* درەوشانەوەی بۆکسەکان */ }
     .box textarea { width: 100%; min-height: 120px; border: none; background: transparent; color: var(--text-color); font-size: 18px; text-align: center; resize: none; outline: none; }
     .box-label { font-size: 14px; font-weight: bold; color: var(--text-color); margin-top: 10px; }
-    
     .arrow-down { text-align: center; font-size: 24px; color: var(--primary); margin: -5px 0 10px 0; }
-
-    .box.dark-box { background: var(--primary); border-color: var(--primary); color: white; }
+    
+    .box.dark-box { background: var(--primary); border-color: var(--primary); color: white; box-shadow: 0 0 20px var(--glow-color); /* درەوشانەوەی زیاتر بۆ کوردی */ }
     .box.dark-box textarea { color: white; }
     .box.dark-box .box-label { color: white; }
-
-    .action-btn { background: var(--primary); color: white; border: none; border-radius: 20px; padding: 18px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: auto; display: flex; justify-content: center; align-items: center; gap: 10px; width: 100%; box-shadow: 0 4px 15px rgba(24, 116, 165, 0.3); }
+    
+    .action-btn { background: var(--primary); color: white; border: none; border-radius: 20px; padding: 18px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: auto; display: flex; justify-content: center; align-items: center; gap: 10px; width: 100%; box-shadow: 0 0 25px var(--glow-color); /* درەوشانەوەی دوگمەکان */ }
     .action-btn:disabled { opacity: 0.6; cursor: wait; }
+    
+    .clickable-box { cursor: pointer; transition: transform 0.2s; }
+    .clickable-box:active { transform: scale(0.98); }
 
-    /* بەشی وێنە */
-    .upload-area { border: 2px dashed var(--primary); border-radius: 20px; padding: 40px 20px; text-align: center; cursor: pointer; background: var(--card-bg); margin-bottom: 20px; }
-    .upload-icon { font-size: 40px; color: var(--primary); margin-bottom: 10px; }
-    .upload-text { color: var(--text-color); font-weight: bold; font-size: 16px; }
-    #imageFile { display: none; }
-    .canvas-container { width: 100%; overflow-x: auto; margin-bottom: 15px; display: none; border: 2px solid var(--border-color); border-radius: 12px; }
-    canvas { max-width: 100%; height: auto; display: block; }
-    
-    /* نەخشی باکگراوند */
-    .waves { position: absolute; bottom: 100px; left: 10px; opacity: 0.3; }
-    .waves2 { position: absolute; top: 300px; right: 10px; opacity: 0.3; }
-    
+    /* شاشەی دەرکەوتنی وێنەکە بە گەورەیی (Modal) */
+    .image-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; justify-content: center; align-items: center; flex-direction: column; padding: 20px; }
+    .image-modal.show { display: flex; }
+    .image-modal canvas { max-width: 100%; max-height: 70vh; border-radius: 12px; box-shadow: 0 0 30px rgba(255,255,255,0.2); }
+    .close-modal { color: white; font-size: 35px; align-self: flex-end; cursor: pointer; margin-bottom: 15px; background: none; border: none; }
+    .download-modal-btn { background: #10b981; color: white; border: none; border-radius: 20px; padding: 15px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 20px; width: 100%; max-width: 300px; box-shadow: 0 0 20px rgba(16, 185, 129, 0.4); }
+
     #statusMsg { text-align: center; font-size: 13px; margin-top: 10px; color: var(--text-color); }
   </style>
 </head>
 <body>
-
   <div class="app-container">
     <header>
       <button class="theme-toggle" id="themeBtn" onclick="toggleTheme()">🌓</button>
@@ -99,7 +83,7 @@
     <!-- بەشی نووسین -->
     <main id="tab-text" class="tab-content active">
       <div class="box">
-        <textarea id="sourceText" placeholder="Write english text here"></textarea>
+        <textarea id="sourceText" placeholder="Write english text here..."></textarea>
       </div>
       <div class="box-label" style="text-align: center; margin-top:-5px; margin-bottom:5px;">دەقی ئینگلیزی</div>
       
@@ -111,99 +95,117 @@
       <div class="box-label" style="text-align: center; margin-top:-5px;">دەقی کوردی</div>
 
       <div style="flex-grow: 1;"></div>
-      <button class="action-btn" onclick="translateText()">وەرگێڕان بۆ کوردی 🔄</button>
+      <button class="action-btn" id="translateTextBtn" onclick="translateText()">وەرگێڕان بۆ کوردی 🔄</button>
     </main>
 
     <!-- بەشی فایل -->
     <main id="tab-file" class="tab-content">
-      <div class="box" style="padding: 25px 15px;">
+      <div class="box clickable-box" style="padding: 25px 15px;">
         <span style="font-size:18px; font-weight:bold;">📄 Englishbook.pdf</span>
       </div>
       <div class="box-label" style="text-align: center; margin-top:-5px; margin-bottom:5px;">ئەو فایلەی دیاری کراوە</div>
-      
       <div class="arrow-down">↓</div>
-
-      <div class="box" style="background: #d1fae5; border-color: #34d399; padding: 25px 15px;">
-        <span style="font-size:18px; font-weight:bold; color: #065f46;">📄 Englishbook_Kurdish.pdf</span>
+      <div class="box dark-box clickable-box" style="padding: 25px 15px;">
+        <span style="font-size:18px; font-weight:bold;">📄 Englishbook_Kurdish.pdf</span>
       </div>
-      <div class="box-label" style="text-align: center; margin-top:-5px;">ئەو فایلەی وەرگێڕدراو بۆ زمانی کوردی</div>
-
+      <div class="box-label" style="text-align: center; margin-top:-5px;">ئەو فایلەی وەرگێڕدراو بۆ کوردی</div>
       <div style="flex-grow: 1;"></div>
       <button class="action-btn" onclick="alert('بەشی فایل لە داهاتوودا بەردەست دەبێت')">داگرتنی فایلی وەرگێڕدراو 📥</button>
     </main>
 
-    <!-- بەشی وێنە -->
+    <!-- بەشی وێنە (نوێکراوەتەوە) -->
     <main id="tab-image" class="tab-content">
-      <label for="imageFile">
-        <div class="upload-area">
-          <div class="upload-icon">↑</div>
-          <div class="upload-text">وێنەکە لێرە دابنێ یان کامێرا بکەرەوە</div>
-        </div>
-      </label>
-      <input id="imageFile" type="file" accept="image/jpeg, image/png, image/webp">
+      <input id="imageFile" type="file" accept="image/jpeg, image/png, image/webp" style="display:none;">
       
-      <div class="canvas-container" id="canvasContainer">
-        <canvas id="imageCanvas"></canvas>
+      <!-- بۆکسی یەکەم (وێنەی ئینگلیزی) -->
+      <div class="box clickable-box" style="padding: 25px 15px;" onclick="document.getElementById('imageFile').click()">
+        <span id="originalImageName" style="font-size:18px; font-weight:bold; color: var(--primary);">📷 کرتە بکە بۆ هەڵبژاردنی وێنە</span>
       </div>
+      <div class="box-label" style="text-align: center; margin-top:-5px; margin-bottom:5px;">وێنە ئینگلیزییەکە</div>
       
-      <p id="statusMsg"></p>
+      <div class="arrow-down">↓</div>
+      
+      <!-- بۆکسی دووەم (وێنەی کوردی) -->
+      <div class="box dark-box clickable-box" id="boxTranslatedImage" style="padding: 25px 15px; opacity: 0.6;" onclick="showTranslatedImage()">
+        <span id="translatedImageName" style="font-size:18px; font-weight:bold;">📷 وێنەی کوردی لێرە دەردەکەوێت</span>
+      </div>
+      <div class="box-label" style="text-align: center; margin-top:-5px;">کرتە لە ناوەکە بکە بۆ بینینی وێنەکە</div>
 
+      <p id="statusMsg"></p>
+      
       <div style="flex-grow: 1;"></div>
-      <button class="action-btn" id="translateImageBtn" onclick="processImage()">وێنەی وەرگێڕدراو بۆ کوردی 🖼️</button>
-      <button class="action-btn" id="downloadImageBtn" style="display:none; background:#10b981; margin-top:10px;" onclick="downloadTranslatedImage()">داگرتنی وێنەکە 📥</button>
+      <button class="action-btn" id="translateImageBtn" onclick="processImage()">وەرگێڕان بۆ کوردی 🔄</button>
     </main>
+
+    <!-- پەنجەرەی دەرکەوتنی وێنەکە -->
+    <div id="imageModal" class="image-modal">
+      <button class="close-modal" onclick="closeModal()">✕</button>
+      <canvas id="imageCanvas"></canvas>
+      <button class="download-modal-btn" onclick="downloadTranslatedImage()">داگرتنی وێنەکە 📥</button>
+    </div>
 
   </div>
 
   <script>
-    // تکایە لێرەدا لینکە ڕاستەقینەکەی Worker ـەکەت دابنێ
-    const WORKER_URL = "YOUR_WORKER_URL_HERE"; // بیخە شوێنی ئەمە
+    const WORKER_URL = "https://wild-hat-0191.themost2727.workers.dev";
     
-    // دۆخی تاریک و ڕوون
     function toggleTheme() {
       const current = document.documentElement.getAttribute('data-theme');
-      if(current === 'dark') {
-        document.documentElement.removeAttribute('data-theme');
-      } else {
-        document.documentElement.setAttribute('data-theme', 'dark');
-      }
+      if(current === 'dark') document.documentElement.removeAttribute('data-theme');
+      else document.documentElement.setAttribute('data-theme', 'dark');
     }
 
-    // گۆڕینی تابلۆکان (Tabs)
     function switchTab(tabId) {
       document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
       document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-      
       event.currentTarget.classList.add('active');
       document.getElementById('tab-' + tabId).classList.add('active');
     }
 
-    // لۆجیکی پێشووی وێنەکە
-    let originalImageObj = null;
+    // وەرگێڕانی دەق
+    async function translateText() {
+      const input = document.getElementById("sourceText").value.trim();
+      const resultBox = document.getElementById("resultText");
+      const btn = document.getElementById("translateTextBtn");
 
-    function translateText() {
-      document.getElementById("resultText").value = "ئەم بەشە هێشتا بە Gemini نەبەستراوەتەوە.";
+      if (!input) { resultBox.value = "تکایە سەرەتا دەقەکە بنووسە."; return; }
+      btn.disabled = true; resultBox.value = "خەریکی وەرگێڕان...";
+
+      try {
+        const response = await fetch(WORKER_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: input })
+        });
+        const data = await response.json();
+        if (data.error) throw new Error(data.error);
+        resultBox.value = data.translation;
+      } catch (error) {
+        resultBox.value = "کێشەیەک ڕوویدا: " + error.message;
+      } finally {
+        btn.disabled = false;
+      }
     }
+
+    // بەشی وێنە و مۆدێل
+    let originalImageObj = null;
+    let isImageTranslated = false;
 
     document.getElementById("imageFile").addEventListener("change", event => {
       const file = event.target.files[0];
       if (file) {
-        document.getElementById("statusMsg").textContent = "وێنە هەڵبژێردرا: " + file.name;
-        document.getElementById("canvasContainer").style.display = "none";
-        document.getElementById("downloadImageBtn").style.display = "none";
-        document.getElementById("translateImageBtn").style.display = "flex";
+        document.getElementById("originalImageName").textContent = "📷 " + file.name;
+        document.getElementById("originalImageName").style.color = "var(--text-color)";
+        
+        // ڕیسێتکردنەوەی بۆکسی دووەم
+        document.getElementById("translatedImageName").textContent = "📷 چاوەڕێی وەرگێڕانە...";
+        document.getElementById("boxTranslatedImage").style.opacity = "0.6";
+        document.getElementById("statusMsg").textContent = "";
+        isImageTranslated = false;
         
         const reader = new FileReader();
         reader.onload = function(e) {
           originalImageObj = new Image();
-          originalImageObj.onload = function() {
-            const canvas = document.getElementById('imageCanvas');
-            canvas.width = originalImageObj.width;
-            canvas.height = originalImageObj.height;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(originalImageObj, 0, 0);
-            document.getElementById("canvasContainer").style.display = "block";
-          }
           originalImageObj.src = e.target.result;
         }
         reader.readAsDataURL(file);
@@ -211,26 +213,34 @@
     });
 
     async function processImage() {
-      if (!originalImageObj) {
-        document.getElementById("statusMsg").textContent = "تکایە سەرەتا وێنەیەک هەڵبژێرە";
-        return;
-      }
-
+      if (!originalImageObj) { document.getElementById("statusMsg").textContent = "تکایە سەرەتا بە کرتەکردن لە بۆکسی یەکەم وێنەیەک هەڵبژێرە"; return; }
+      
       const btn = document.getElementById("translateImageBtn");
       const status = document.getElementById("statusMsg");
       btn.disabled = true;
       status.innerHTML = "خەریکی وەرگێڕان... تکایە چاوەڕێ بە.";
 
       try {
-        const canvas = document.getElementById('imageCanvas');
-        const base64Image = canvas.toDataURL("image/jpeg").split(',')[1];
+        // ئامادەکردنی ناوی نوێ بۆ وێنەکە
+        const originalName = document.getElementById("imageFile").files[0].name;
+        const nameParts = originalName.split('.');
+        const ext = nameParts.pop();
+        const kurdishName = nameParts.join('.') + "_Kurdish." + ext;
+
+        // کێشانی وێنەکە بۆ سەر Canvas بۆ ناردن
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = originalImageObj.width;
+        tempCanvas.height = originalImageObj.height;
+        const tempCtx = tempCanvas.getContext('2d');
+        tempCtx.drawImage(originalImageObj, 0, 0);
+        const base64Image = tempCanvas.toDataURL("image/jpeg").split(',')[1];
 
         const response = await fetch(WORKER_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ image: base64Image, mimeType: 'image/jpeg' })
         });
-
+        
         if (!response.ok) throw new Error("کێشەیەک لە پەیوەندی سێرڤەر ڕوویدا");
         const data = await response.json();
         if (data.error) throw new Error(data.error);
@@ -241,24 +251,29 @@
            else throw new Error("فۆرماتی داتا هەڵەیە");
         }
 
-        status.innerHTML = "وەرگێڕان بە سەرکەوتوویی تەواو بوو!";
-        drawTranslationsOnCanvas(transArray);
-        
-        btn.style.display = "none";
-        document.getElementById("downloadImageBtn").style.display = "flex";
+        // کێشانی وەرگێڕانەکان لەسەر Canvas ئەسڵییەکە
+        const canvas = document.getElementById('imageCanvas');
+        canvas.width = originalImageObj.width;
+        canvas.height = originalImageObj.height;
+        drawTranslationsOnCanvas(canvas, transArray);
+
+        // نوێکردنەوەی بۆکسی دووەم
+        document.getElementById("translatedImageName").textContent = "📷 " + kurdishName;
+        document.getElementById("boxTranslatedImage").style.opacity = "1";
+        status.innerHTML = "وەرگێڕان بە سەرکەوتوویی تەواو بوو! کرتە لە ناوی وێنە کوردییەکە بکە.";
+        isImageTranslated = true;
 
       } catch (error) {
         status.textContent = "کێشەیەک ڕوویدا: " + error.message;
+      } finally {
         btn.disabled = false;
       }
     }
 
-    function drawTranslationsOnCanvas(translations) {
-      const canvas = document.getElementById('imageCanvas');
+    function drawTranslationsOnCanvas(canvas, translations) {
       const ctx = canvas.getContext('2d');
       const width = canvas.width;
       const height = canvas.height;
-
       ctx.drawImage(originalImageObj, 0, 0);
 
       translations.forEach(item => {
@@ -269,28 +284,39 @@
         const boxWidth = ((xmax - xmin) / 1000) * width;
         const boxHeight = ((ymax - ymin) / 1000) * height;
 
-        ctx.fillStyle = 'rgba(24, 116, 165, 0.85)'; // شینی دیزاینەکە
+        ctx.fillStyle = 'rgba(74, 179, 237, 0.9)'; // ڕەنگە کاڵەکە بۆ بۆکسی وەرگێڕان
         ctx.fillRect(x, y, boxWidth, boxHeight);
 
         ctx.fillStyle = '#ffffff';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.direction = 'rtl';
-        
         let fontSize = Math.min(boxHeight * 0.7, boxWidth * 0.15); 
         ctx.font = `bold ${fontSize}px Arial, sans-serif`;
-        
         const textX = x + (boxWidth / 2); 
         const textY = y + (boxHeight / 2);
-        
         ctx.fillText(item.kurdish_translation || "", textX, textY);
       });
+    }
+
+    // پیشاندانی وێنەکە کاتێک کرتە لە بۆکسەکە دەکرێت
+    function showTranslatedImage() {
+      if (isImageTranslated) {
+        document.getElementById('imageModal').classList.add('show');
+      } else {
+        alert("تکایە سەرەتا وێنەیەک هەڵبژێرە و دوگمەی وەرگێڕان دابگرە!");
+      }
+    }
+
+    // داخستنی پەنجەرەی وێنەکە
+    function closeModal() {
+      document.getElementById('imageModal').classList.remove('show');
     }
 
     function downloadTranslatedImage() {
       const canvas = document.getElementById('imageCanvas');
       const link = document.createElement('a');
-      link.download = 'translated-image.png';
+      link.download = document.getElementById("translatedImageName").textContent.replace('📷 ', '');
       link.href = canvas.toDataURL("image/png");
       link.click();
     }
