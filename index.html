@@ -59,9 +59,15 @@
 
     .image-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; justify-content: center; align-items: center; flex-direction: column; padding: 20px; }
     .image-modal.show { display: flex; }
-    .image-modal canvas { max-width: 100%; max-height: 70vh; border-radius: 12px; box-shadow: 0 0 30px rgba(255,255,255,0.2); }
-    .close-modal { color: white; font-size: 35px; align-self: flex-end; cursor: pointer; margin-bottom: 15px; background: none; border: none; }
-    .download-modal-btn { background: #10b981; color: white; border: none; border-radius: 20px; padding: 15px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 20px; width: 100%; max-width: 300px; box-shadow: 0 0 20px rgba(16, 185, 129, 0.4); }
+    .modal-content-wrapper { overflow-y: auto; max-height: 75vh; width: 100%; display: flex; flex-direction: column; align-items: center; }
+    .image-modal canvas { max-width: 100%; height: auto; border-radius: 12px; box-shadow: 0 0 30px rgba(255,255,255,0.2); }
+    .close-modal { color: white; font-size: 35px; align-self: flex-end; cursor: pointer; margin-bottom: 5px; background: none; border: none; }
+    .download-modal-btn { background: #10b981; color: white; border: none; border-radius: 20px; padding: 15px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 15px; width: 100%; max-width: 300px; box-shadow: 0 0 20px rgba(16, 185, 129, 0.4); }
+    
+    .text-fallback { background: var(--card-bg); color: var(--text-color); width: 100%; max-width: 100%; border-radius: 12px; padding: 15px; margin-top: 15px; text-align: right; display: none; }
+    .text-fallback h3 { margin-top: 0; font-size: 16px; color: var(--primary); }
+    .text-fallback ul { padding-right: 20px; margin: 0; }
+    .text-fallback li { margin-bottom: 8px; font-size: 14px; border-bottom: 1px solid var(--border-color); padding-bottom: 5px; }
 
     #statusMsg { text-align: center; font-size: 13px; margin-top: 10px; color: var(--text-color); }
   </style>
@@ -97,7 +103,7 @@
       <button class="action-btn" id="translateTextBtn" onclick="translateText()">وەرگێڕان بۆ کوردی 🔄</button>
     </main>
 
-    <!-- بەشی فایل (چاککراو) -->
+    <!-- بەشی فایل -->
     <main id="tab-file" class="tab-content">
       <input id="docFile" type="file" accept=".pdf,.doc,.docx,.txt" style="display:none;">
       
@@ -142,7 +148,10 @@
     <!-- پەنجەرەی دەرکەوتنی وێنەکە -->
     <div id="imageModal" class="image-modal">
       <button class="close-modal" onclick="closeModal()">✕</button>
-      <canvas id="imageCanvas"></canvas>
+      <div class="modal-content-wrapper">
+        <canvas id="imageCanvas"></canvas>
+        <div id="textFallback" class="text-fallback"></div>
+      </div>
       <button class="download-modal-btn" onclick="downloadTranslatedImage()">داگرتنی وێنەکە 📥</button>
     </div>
 
@@ -164,7 +173,6 @@
       document.getElementById('tab-' + tabId).classList.add('active');
     }
 
-    // وەرگێڕانی دەق
     async function translateText() {
       const input = document.getElementById("sourceText").value.trim();
       const resultBox = document.getElementById("resultText");
@@ -189,7 +197,6 @@
       }
     }
 
-    // لۆجیکی بەشی فایل (نوێ)
     document.getElementById("docFile").addEventListener("change", event => {
       const file = event.target.files[0];
       if (file) {
@@ -205,7 +212,6 @@
       }
     });
 
-    // بەشی وێنە و مۆدێل
     let originalImageObj = null;
     let isImageTranslated = false;
 
@@ -218,6 +224,7 @@
         document.getElementById("translatedImageName").textContent = "📷 چاوەڕێی وەرگێڕانە...";
         document.getElementById("boxTranslatedImage").style.opacity = "0.6";
         document.getElementById("statusMsg").textContent = "";
+        document.getElementById("textFallback").style.display = "none";
         isImageTranslated = false;
         
         const reader = new FileReader();
@@ -266,10 +273,24 @@
            else throw new Error("فۆرماتی داتا هەڵەیە");
         }
 
+        // پشکنین بۆ ئەوەی بزانین دەقی دۆزیوەتەوە یان نا
+        if (transArray.length === 0) {
+           throw new Error("مۆدێلەکە هیچ دەقێکی لەم وێنەیەدا نەدۆزییەوە، تکایە دووبارە تاقیی بکەرەوە.");
+        }
+
         const canvas = document.getElementById('imageCanvas');
         canvas.width = originalImageObj.width;
         canvas.height = originalImageObj.height;
         drawTranslationsOnCanvas(canvas, transArray);
+
+        // ئامادەکردنی لیستی دەقەکان بۆ حاڵەتی یەدەگ
+        let fallbackHtml = "<h3>دەقە وەرگێڕدراوەکان:</h3><ul>";
+        transArray.forEach(item => {
+           fallbackHtml += `<li><b>${item.original_text || "نەزانراو"}</b> <br> ${item.kurdish_translation || ""}</li>`;
+        });
+        fallbackHtml += "</ul>";
+        document.getElementById("textFallback").innerHTML = fallbackHtml;
+        document.getElementById("textFallback").style.display = "block";
 
         document.getElementById("translatedImageName").textContent = "📷 " + kurdishName;
         document.getElementById("boxTranslatedImage").style.opacity = "1";
@@ -297,19 +318,17 @@
         const boxWidth = ((xmax - xmin) / 1000) * width;
         const boxHeight = ((ymax - ymin) / 1000) * height;
 
-        // گۆڕینی ڕەنگەکە بۆ خۆڵەمێشییەکی تاریک
         ctx.fillStyle = 'rgba(75, 85, 99, 0.95)'; 
         ctx.fillRect(x, y, boxWidth, boxHeight);
 
-        // ڕێکخستنی زیرەکانەی قەبارەی فۆنتەکە بۆ ئەوەی ڕێک لەناو بۆکسەکە جێی ببێتەوە
         const text = item.kurdish_translation || "";
-        let fontSize = boxHeight * 0.7; // سەرەتا بەپێی بەرزی
+        let fontSize = boxHeight * 0.7; 
         ctx.font = `bold ${fontSize}px Arial, sans-serif`;
         
         let textMetrics = ctx.measureText(text);
-        if (textMetrics.width > boxWidth * 0.9) { // ئەگەر وشەکە درێژ بوو
-           fontSize = fontSize * ((boxWidth * 0.9) / textMetrics.width); // قەبارەکە بچووک دەکاتەوە
-           if (fontSize < 10) fontSize = 10; // بۆ ئەوەی زۆر بچووک نەبێت و بخوێنرێتەوە
+        if (textMetrics.width > boxWidth * 0.9) { 
+           fontSize = fontSize * ((boxWidth * 0.9) / textMetrics.width); 
+           if (fontSize < 10) fontSize = 10; 
            ctx.font = `bold ${fontSize}px Arial, sans-serif`;
         }
 
